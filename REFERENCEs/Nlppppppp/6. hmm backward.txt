@@ -1,0 +1,55 @@
+#defined input
+
+noOfStates=2
+noOfEmissions=3
+# transsionProb={
+#     "cp":{"cp":0.7,"ip":0.3},
+#     "ip":{"cp":0.5,"ip":0.5}
+# }
+transsionProb=[
+    [0.7,0.3],
+    [0.5,0.5]
+]
+
+# emissionProb={
+#     "cp":{"cola":0.6,"icet":0.1,"lem":0.3},
+#     "ip":{"cola":0.1,"icet":0.7,"lem":0.2}
+# }
+emissionProb=[
+    [0.3,0.1,0.6],
+    [0.2,0.7,0.1]
+]
+initialProbs=[1,0]
+emissionProb
+transsionProb
+
+
+
+
+table=[[0 for _ in range(noOfEmissions+1)] for _ in range(noOfStates)]
+table
+#filling intial probs
+for i in range(noOfStates):
+    table[i][noOfEmissions]=1
+table
+
+
+
+for i in range(noOfEmissions-1,-1,-1):
+    for j in range(noOfStates):
+        for k in range(noOfStates):
+            table[j][i]+=table[k][i+1]*transsionProb[j][k]*emissionProb[j][i]
+        table[j][i]=round(table[j][i],5)
+print(table)
+ans=0
+for i in range(noOfStates):
+    ans+=table[i][noOfEmissions]
+ans=round(ans,4)
+ans
+
+
+
+ans=0
+for i in range(noOfStates):
+    ans+=initialProbs[i]*table[i][0]
+ans

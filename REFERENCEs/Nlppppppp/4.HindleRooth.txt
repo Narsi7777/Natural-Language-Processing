@@ -1,0 +1,16 @@
+import math
+nounFreq=int(input("Enter Noun frequency"))
+verbFreq=int(input("Enter Verb frequency"))
+nounWithPP=int(input("Enter frequency of Noun attached to PP"))
+verbWithPp=int(input("Enter frequency of Verb attached to PP"))
+
+probOfVerbWithPP=verbWithPp/verbFreq
+probOfNounWithPP=nounWithPP/nounFreq
+probOfNounWithOutPP=1-probOfNounWithPP
+
+ans=round(math.log((probOfVerbWithPP*probOfNounWithOutPP)/probOfNounWithPP)/math.log(2),5)
+print("\n\nlikelihood ratio\n\n",ans)
+if(ans>0):
+    print("\n\nPP is attached with Verb")
+else:
+    print("\n\nPP is attached with Noun")

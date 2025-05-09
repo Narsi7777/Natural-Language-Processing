@@ -1,0 +1,40 @@
+import nltk
+nltk.download('all')
+
+
+from nltk import word_tokenize,sent_tokenize
+sent = "GeeksforGeeks is a great learning platform. \
+It is one of the best for Computer Science students."
+print(sent)
+nltk.download('punkt')
+words=word_tokenize(sent)
+print(words)
+sentences=sent_tokenize(sent)
+print(sentences)
+
+from nltk.stem import PorterStemmer
+st=PorterStemmer()
+print(st.stem('playing'))
+print(st.stem('plays'))
+print(st.stem("Communication"))
+
+
+# nltk.download('wordnet')
+from nltk.stem import WordNetLemmatizer
+lm=WordNetLemmatizer()
+print(lm.lemmatize('communication'))
+
+
+
+from nltk import pos_tag
+print(words)
+tags=pos_tag(words)
+tags
+
+
+# nltk.download('maxent_ne_chunker_tab')
+nltk.download('words')
+from nltk import ne_chunk
+print(ne_chunk(tags))
+
+

@@ -1,0 +1,84 @@
+	text	label
+0	I love programming	positive
+1	Python is great	positive
+2	I enjoy machine learning	positive
+3	TensorFlow is a powerful tool	positive
+4	AI is the future	neutral
+
+
+
+
+
+import pandas as pd
+data=pd.read_csv('texts.csv')
+data.head()
+
+
+from sklearn.preprocessing import LabelEncoder
+en=LabelEncoder()
+data['label']=en.fit_transform(data['label'])
+data
+
+
+from sklearn.model_selection import train_test_split
+xTrain,xTest,yTrain,yTest=train_test_split(data['text'],data['label'],test_size=0.4,random_state=42)
+xTrain,xTest
+
+
+
+from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer
+bow=CountVectorizer()
+xTrainBow=bow.fit_transform(xTrain).toarray()
+xTestBow=bow.transform(xTest).toarray()
+xTestBow
+
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+def buildModel(inputDim):
+    model=Sequential(
+        [
+            Dense(16,activation='relu',input_dim=inputDim),
+            Dense(8,activation='relu'),
+            Dense(1,activation='sigmoid')
+        ]
+    )
+    model.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])
+    return model
+modelBow=buildModel(xTrainBow.shape[1])
+modelBow.fit(xTrainBow,yTrain,epochs=10,batch_size=2,verbose=1)
+
+
+
+
+loss,acc=modelBow.evaluate(xTestBow,yTest)
+print(acc)
+
+
+
+tfidf=TfidfVectorizer()
+xTrainIdf=tfidf.fit_transform(xTrain).toarray()
+xTestIdf=tfidf.transform(xTest).toarray()
+
+
+modelIdf=buildModel(xTrainIdf.shape[1])
+modelIdf.fit(xTrainIdf,yTrain,epochs=10,batch_size=2,verbose=1)
+loss2,acc2=modelIdf.evaluate(xTestIdf,yTest)
+print(acc2)
+
+
+text = "Python is programming"
+text = vectorizer_tfidf.transform([text]).toarray()
+results = model_tfidf.predict(text)
+
+a = np.argmax(results)
+"Positive" if a == 1 else "Neutral"
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step
+'Neutral'
+text = "Python is programming"
+text = vectorizer_bow.transform([text]).toarray()
+results = model_bow.predict(text)
+
+a = np.argmax(results)
+"Positive" if a == 1 else "Neutral"
+

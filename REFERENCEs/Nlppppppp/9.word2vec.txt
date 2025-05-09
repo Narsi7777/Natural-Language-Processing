@@ -1,0 +1,26 @@
+import gensim
+from gensim.models import Word2Vec
+import nltk
+from nltk.tokenize import word_tokenize,sent_tokenize
+# nltk.download('punkt')
+from nltk.corpus import stopwords
+corpus = [
+    "I love to play football.",
+    "Football is a great sport.",
+    "I enjoy playing basketball.",
+    "Basketball is also a fun game.",
+    "I like watching sports.",
+    "Sports are very entertaining."
+ ]
+tokenizedCorpus=[word_tokenize(sentence.lower()) for sentence in corpus]
+print(tokenizedCorpus)
+help(Word2Vec)
+model=Word2Vec(sentences=tokenizedCorpus,vector_size=100,window=5,min_count=1,workers=4)
+similarWords=model.wv.most_similar('football')
+print(similarWords)
+similarity=model.wv.similarity('football','basketball')
+print(similarity)
+
+
+
+

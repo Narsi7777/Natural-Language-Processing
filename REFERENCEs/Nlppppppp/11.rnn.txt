@@ -1,0 +1,60 @@
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, SimpleRNN, Dense
+import numpy as np
+
+# Sample data
+sourceText=['hello', 'how are you', 'goodbye']
+targetText=['bonjour', 'comment ça va', 'au revoir']
+# help(Tokenizer())
+# Tokenizers
+sourceTokenizer = Tokenizer()
+targetTokenizer = Tokenizer()
+sourceTokenizer.fit_on_texts(sourceText)
+targetTokenizer.fit_on_texts(targetText)
+
+# Text to sequences
+sourceSequences = sourceTokenizer.texts_to_sequences(sourceText)
+targetSequences = targetTokenizer.texts_to_sequences(targetText)
+
+# Padding
+sourceSequences = pad_sequences(sourceSequences,padding='post')
+targetSequences = pad_sequences(targetSequences,maxlen=sourceSequences.shape[1],padding='post')
+
+# Reshape target
+targetSequences = np.expand_dims(targetSequences, -1)
+
+# Prepare input
+x = sourceSequences
+x = x.reshape(x.shape[0], x.shape[1])  # No need for 3D shape when using Embedding
+help(sourceTokenizer)
+# Model with Embedding
+model = Sequential([
+    Embedding(input_dim=len(sourceTokenizer.word_index) + 1, output_dim=16),
+    SimpleRNN(16, return_sequences=True),
+    Dense(len(targetTokenizer.word_index) + 1, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+
+# Train
+model.fit(x, targetSequences, epochs=100)
+
+# Translator function
+def transulator(text):
+    sequence = sourceTokenizer.texts_to_sequences([text])
+    padded_sequence = pad_sequences(sequence, maxlen=sourceSequences.shape[1], padding='post')
+    prediction = model.predict(padded_sequence)
+    transulated_sentence = []
+    for wordProbs in prediction[0]:
+        predictedWordIndx = np.argmax(wordProbs)
+        word = targetTokenizer.index_word.get(predictedWordIndx, "")
+        if word:
+            transulated_sentence.append(word)
+    return ' '.join(transulated_sentence)
+
+# Test
+print(transulator('hello'))
+print(transulator('how are you'))
+print(transulator('goodbye'))

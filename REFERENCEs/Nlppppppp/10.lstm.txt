@@ -1,0 +1,96 @@
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Embedding
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.utils import to_categorical
+
+# Sample corpus (replace with your own text file)
+corpus = """
+The quick brown fox jumps over the lazy dog.
+To be or not to be, that is the question.
+All that glitters is not gold.
+The early bird catches the worm.
+"""
+
+def prepare_data(text, seq_length=5):  # Reduced sequence length for small corpus
+    # Tokenize the text
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts([text])
+    total_words = len(tokenizer.word_index) + 1
+    
+    # Create input sequences
+    sequences = []
+    for line in text.split('\n'):
+        if line.strip():  # Skip empty lines
+            token_list = tokenizer.texts_to_sequences([line])[0]
+            for i in range(seq_length, len(token_list)):
+                seq = token_list[i-seq_length:i+1]
+                sequences.append(seq)
+    
+    if not sequences:
+        raise ValueError("No sequences generated. Check your corpus and sequence length.")
+    
+    # Pad sequences and split into predictors and label
+    sequences = np.array(pad_sequences(sequences, maxlen=seq_length+1, padding='pre'))
+    X, y = sequences[:,:-1], sequences[:,-1]
+    y = to_categorical(y, num_classes=total_words)  # Convert to one-hot encoding
+    
+    return X, y, tokenizer, total_words, seq_length
+
+def build_model(total_words, seq_length):
+    model = Sequential([
+        Embedding(total_words, 50, input_length=seq_length),
+        LSTM(100, return_sequences=True),
+        LSTM(100),
+        Dense(100, activation='relu'),
+        Dense(total_words, activation='softmax')  # Fixed typo: Dense instead of Dense
+    ])
+    
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return model
+
+def generate_text(seed_text, model, tokenizer, seq_length, num_gen_words):
+    output_text = seed_text
+    
+    for _ in range(num_gen_words):
+        # Tokenize the seed text
+        token_list = tokenizer.texts_to_sequences([seed_text])[0]
+        # Pad the sequence
+        token_list = pad_sequences([token_list], maxlen=seq_length, padding='pre')
+        # Predict the next word
+        predicted = model.predict(token_list, verbose=0)
+        predicted_index = np.argmax(predicted, axis=-1)[0]
+        
+        # Convert index to word
+        output_word = ""
+        for word, index in tokenizer.word_index.items():
+            if index == predicted_index:
+                output_word = word
+                break
+                
+        # Add to current text
+        seed_text += " " + output_word
+        output_text += " " + output_word
+        
+    return output_text
+
+# Prepare data
+try:
+    X, y, tokenizer, total_words, seq_length = prepare_data(corpus)
+except ValueError as e:
+    print(f"Error in data preparation: {e}")
+    exit()
+
+# Build and train model
+model = build_model(total_words, seq_length)
+model.fit(X, y, epochs=100, verbose=1)
+
+# Generate text based on user input
+try:
+    user_input = input("Enter a seed text to start generation: ")
+    generated_text = generate_text(user_input, model, tokenizer, seq_length, num_gen_words=10)
+    print("\nGenerated text:")
+    print(generated_text)
+except Exception as e:
+    print(f"Error during text generation: {e}")

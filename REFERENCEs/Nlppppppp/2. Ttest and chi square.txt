@@ -1,0 +1,92 @@
+w1="machine"
+w2="learning"
+w1_count = 50      
+w2_count = 80      
+bigram_count = 30  
+total_words = 10000
+
+import math
+def chi_square_test(w1_count,w2_count,bigram_count,N):
+    A=bigram_count
+    B=w1_count-A
+    C=w2_count-A
+    D=N-(A+B+C)
+    mat=[
+        [A,B],
+        [C,D]
+    ]
+    expected_mat=[
+        [(A+B)*(A+C)/N,(A+B)*(B+D)/N],
+        [(C+D)*(A+C)/N,(C+D)*(B+D)/N]
+    ]
+    ans=0
+    for i in range(0,2):
+        for j in range(0,2):
+            if(expected_mat[i][j]!=0):
+                ans+=math.pow(mat[i][j]-expected_mat[i][j],2)/expected_mat[i][j]
+    print(ans)
+
+
+chi_square_test(w1_count,w2_count,bigram_count,total_words)
+
+
+
+
+
+
+
+
+# if A B C D are directly given 
+import math
+def chi_square_test(A,B,C,D):
+    mat=[
+        [A,B],
+        [C,D]
+    ]
+    N=A+B+C+D
+    expected_mat=[
+        [(A+B)*(A+C)/N,(A+B)*(B+D)/N],
+        [(C+D)*(A+C)/N,(C+D)*(B+D)/N]
+    ]
+    ans=0
+    for i in range(0,2):
+        for j in range(0,2):
+            if(expected_mat[i][j]!=0):
+                ans+=math.pow(mat[i][j]-expected_mat[i][j],2)/expected_mat[i][j]
+    print(ans)
+
+
+
+chi_square_test(18,7,42,33)
+
+
+
+
+#t test
+
+
+w1="new"
+w2="companies"
+w1_count = 15828      
+w2_count = 4675      
+bigram_count =8  
+total_words = 14307668
+
+p_w1=w1_count/total_words
+p_w2=w2_count/total_words
+expected_mean=p_w1*p_w2
+
+observed_mean=bigram_count/total_words
+
+s2=observed_mean
+
+t=(observed_mean-expected_mean)/(math.sqrt((s2/total_words)))
+print(t)
+
+
+
+
+
+
+
+

@@ -1,0 +1,144 @@
+data = [
+    (['put', 'coat', 'back', 'chair', 'sat', 'down'], 'furniture'),
+    (['chair', 'made', 'timber', 'company'], 'furniture'),
+    (['chair', 'institute', 'best'], 'position'),
+    (['award', 'IT', 'chair'], 'position'),
+    (['type', 'different', 'chair', 'award', 'fun', 'use'], 'furniture')
+]
+newData=['award','chair','IT','company']
+
+
+n =input("Enter the size of list: ")
+n = int(n)
+print("Enter data row-wise. Type 'narsi' at the end of each row to exit.")
+
+data = []
+
+
+for _ in range(n):
+  k=int(input("enter row size"))
+  words = []
+  for _ in range(k):
+    word =input("Enter word: ")
+    words.append(word)
+  sense=input("enter sense")
+  data.append((words,sense))
+
+newData=[]
+f=int(input("enter newData size"))
+for _ in range(f):
+    newData.append(input("enter word"))
+print(data)
+print(newData)
+
+
+
+
+
+
+V=set()
+for row in data:
+    for word in row[0]:
+        V.add(word)
+print(V)
+V=len(V)
+print(V)
+
+
+
+
+#make a list of all the senses
+senses=set()
+for hu in data:
+    senses.add(hu[1])
+senses=list(senses)
+print(senses)
+
+
+
+#finding prior  probability
+size=len(data)
+probabilites=[]
+countoFsenses=[]
+for hu in senses:
+    count=0
+    for item in data:
+        if(item[1]==hu):
+            count+=1
+    countoFsenses.append((hu,count))
+    prob=(hu,count/size)
+    probabilites.append(prob)
+print(probabilites)
+print(countoFsenses)
+
+
+
+
+
+#conditional probabilities
+# p(word/sense)
+countOfWords={key:[] for key in senses}
+for word in newData:
+    for sense in senses:
+        wordcount=0
+        for row in data:
+            if(row[1]==sense):
+                for eachword in row[0]:
+                    #print(word,sense,row,eachword)
+                    if(eachword==word):
+                        wordcount+=1
+        #print(word,sense,wordcount)
+        countOfWords[sense].append((word,wordcount))
+print(countOfWords)
+
+
+
+
+
+#conditional probabilities
+conditinalProbabilities={key:[] for key in senses}
+for key,value in countOfWords.items():
+    senseCount=0
+    for tup in countoFsenses:
+        if tup[0]==key:
+            senseCount=tup[1]
+    for val in value:
+        prob=(val[1]+1)/(senseCount+V)
+        prob=round(prob,5)
+        conditinalProbabilities[key].append((val[0],prob))
+print(conditinalProbabilities)
+
+
+
+
+
+import math
+scores={}
+for sense in senses:
+    scores[sense]=0
+
+for key,prbs in conditinalProbabilities.items():
+    for prb in prbs:
+        scores[key]+=math.log(prb[1])
+    for preProb in probabilites:
+        if(preProb[0]==key):
+            scores[key]+=math.log(preProb[1])
+print(scores)
+
+
+
+
+
+
+ans=""
+huhu=-9999
+for key,value in scores.items():
+    if value>huhu:
+        huhu=value
+        ans=key
+print(key)"
+
+
+
+
+

@@ -1,0 +1,86 @@
+#defined input
+
+noOfStates=2
+noOfEmissions=3
+# transsionProb={
+#     "cp":{"cp":0.7,"ip":0.3},
+#     "ip":{"cp":0.5,"ip":0.5}
+# }
+transsionProb=[
+    [0.7,0.3],
+    [0.5,0.5]
+]
+# emissionProb={
+#     "cp":{"cola":0.6,"icet":0.1,"lem":0.3},
+#     "ip":{"cola":0.1,"icet":0.7,"lem":0.2}
+# }
+emissionProb=[
+    [0.3,0.1,0.6],
+    [0.2,0.7,0.1]
+]
+initialProbs=[1,0]
+emissionProb
+transsionProb
+
+
+
+
+#manual input
+noOfStates=int(input("Enter no of States"))
+noOfEmissions=int(input("Enter No of Emissions"))
+print("Enter States one by sequentially")
+trans=[]
+for i in range(noOfStates):
+    trans.append(input(f"Enter{i+1}th Transsion"))
+print("Enter Emissions sequentially ")
+emms=[]
+for i in range(noOfEmissions):
+    emms.append(input(f"Enter{i+1}th Emission State"))
+print(trans)
+print(emms)
+
+
+
+
+#manula input 2
+transsionProb=[]
+for s in trans:
+    x=[]
+    for t in trans:
+        x.append(float(input(f"Enter Transsion probability from {s} to {t}")))
+    transsionProb.append(x)
+emissionProb=[]
+for s in trans:
+    x=[]
+    for t in emms:
+        x.append(float(input(f"Enter Emission probability from {s} to {t}")))
+    emissionProb.append(x)
+print(transsionProb)
+print(emissionProb)
+
+
+
+
+table=[[0 for _ in range(noOfEmissions+1)] for _ in range(noOfStates)]
+table
+#filling intial probs
+for i in range(noOfStates):
+    table[i][0]=initialProbs[i]
+table
+
+
+
+
+for i in range(1,noOfEmissions+1):
+    for j in range(noOfStates):
+        for k in range(noOfStates):
+            table[j][i]+=table[k][i-1]*transsionProb[k][j]*emissionProb[k][i-1]
+        table[j][i]=round(table[j][i],4)
+print(table)
+ans=0
+for i in range(noOfStates):
+    ans+=table[i][noOfEmissions]
+ans=round(ans,4)
+ans
+
+
